@@ -20,7 +20,7 @@
         </activity>
         <activity android:name=".activities.MainActivity"/>
         <activity android:name=".activities.AddContact" />
-        <activity android:name=".ContactDetails"></activity>
+        <activity android:name=".activities.ContactDetails"></activity>
     </application>
 
 </manifest>

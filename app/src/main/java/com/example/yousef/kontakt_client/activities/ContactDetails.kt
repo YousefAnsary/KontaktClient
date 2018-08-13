@@ -1,7 +1,8 @@
-package com.example.yousef.kontakt_client
+package com.example.yousef.kontakt_client.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.example.yousef.kontakt_client.*
 import com.example.yousef.kontakt_client.networking.GRPCTasks
 import kotlinx.android.synthetic.main.activity_contact_details.*
 import org.jetbrains.anko.toast
