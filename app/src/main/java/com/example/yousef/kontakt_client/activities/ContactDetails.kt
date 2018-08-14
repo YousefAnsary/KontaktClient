@@ -5,6 +5,8 @@ import android.os.Bundle
 import com.example.yousef.kontakt_client.*
 import com.example.yousef.kontakt_client.networking.GRPCTasks
 import kotlinx.android.synthetic.main.activity_contact_details.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.toast
 
 class ContactDetails : AppCompatActivity() {
@@ -26,20 +28,28 @@ class ContactDetails : AppCompatActivity() {
             val phoneNumber = PhoneNumber.newBuilder().setNumber(phone_edit_edt.text.toString()).setType(NumberType.MOBILE).build()
             val newContact = Contact.newBuilder().setId(ContactID.newBuilder().setValue(id.toInt()).build())
                              .setName(name_edit_edt.text.toString()).setPhoneNumber(phoneNumber).build()
-            if (GRPCTasks.editContact(newContact)) {
-                toast("edited")
-                onBackPressed()
-            } else {
-                toast("Something wrong happened")
+            launch {
+                var message = "edited"
+                if (!GRPCTasks.editContact(newContact)) {
+                    message = "Something wrong happened"
+                }
+                launch(UI) {
+                    toast(message)
+                    onBackPressed()
+                }
             }
         }
 
         delete_btn.setOnClickListener {
-            if (GRPCTasks.deleteContact(id.toInt())) {
-                toast("deleted")
-                onBackPressed()
-            } else {
-                toast("Something wrong happened")
+            launch {
+                var message = "deleted"
+                if (!GRPCTasks.deleteContact(id.toInt())) {
+                    message = "Something wrong happened"
+                }
+                launch(UI) {
+                    toast(message)
+                    onBackPressed()
+                }
             }
         }
     }

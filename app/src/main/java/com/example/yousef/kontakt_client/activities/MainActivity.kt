@@ -3,12 +3,14 @@ package com.example.yousef.kontakt_client.activities
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import com.example.yousef.kontakt_client.*
 import com.example.yousef.kontakt_client.networking.GRPCTasks
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,9 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
+        Log.d("debug", "x")
         launch {
-            contacts = GRPCTasks.getAllContacts()
+            runBlocking { contacts = GRPCTasks.getAllContacts() }
             var names = mutableListOf<String>()
             contacts?.map { names.add(it.name) }
             launch(UI) { contacts_list.adapter = ArrayAdapter<String>(this@MainActivity, android.R.layout.simple_list_item_1, names) }

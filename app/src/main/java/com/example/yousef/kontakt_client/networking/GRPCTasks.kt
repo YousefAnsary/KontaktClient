@@ -14,63 +14,78 @@ class GRPCTasks{
 
     companion object {
 
-        var channel:ManagedChannel? = null
-        var stub: ContactsGrpc.ContactsBlockingStub? = null
+        private var channel:ManagedChannel? = null
+        private var stub: ContactsGrpc.ContactsBlockingStub? = null
 
-        fun openConnection(hostIP: String = "192.168.184.130", port: Int = 8080): Boolean {
+        suspend fun openConnection(hostIP: String = "192.168.184.130", port: Int = 8080): Boolean {
             try {
                 channel = ManagedChannelBuilder.forAddress(hostIP, port).usePlaintext().build()
                 stub = ContactsGrpc.newBlockingStub(channel)
-                return true
             } catch (e: Exception) {
+                Log.e("debug", e.message)
                 return false
             }
+            return true
         }
 
-        fun addContact(contact: Contact): Boolean {
+        suspend fun addContact(contact: Contact): Boolean {
             var res: ProccessResult? = null
 
             try {
-                runBlocking {
-                    res = stub!!.addContact(contact)
-                }
+                res = stub!!.addContact(contact)
             } catch (e: Exception) {
+                Log.e("debug", e.message)
                 return false
             }
 
             return res!!.status == ProccessStatus.OK
         }
 
-        fun deleteContact(id: Int): Boolean {
+        suspend fun deleteContact(id: Int): Boolean {
+            var isDeleted = false
             try {
-                return stub!!.deleteContact(ContactID.newBuilder().setValue(id).build()).status == ProccessStatus.OK
+                isDeleted = stub!!.deleteContact(ContactID.newBuilder().setValue(id).build()).status == ProccessStatus.OK
             } catch (e: Exception) {
+                Log.e("debug", e.message)
                 return false
             }
+            return isDeleted
         }
 
-        fun editContact(contact: Contact): Boolean {
+        suspend fun editContact(contact: Contact): Boolean {
+            var isEdited = false
             try {
                 val newContact = stub!!.editContact(contact)
-                return newContact.id == contact.id && newContact.name == contact.name && newContact.phoneNumber.number == contact.phoneNumber.number
+                isEdited = newContact.id == contact.id && newContact.name == contact.name && newContact.phoneNumber.number == contact.phoneNumber.number
             } catch (e: Exception) {
-                Log.d("debug", e.message)
+                Log.e("debug", e.message)
                 return false
             }
+            return isEdited
         }
 
-        fun getAllContacts(): List<Contact>? {
+        suspend fun getAllContacts(): List<Contact>? {
             var contacts: List<Contact>? = null
             val request = Void.newBuilder().build()
-            runBlocking {
-                val reply = stub?.getAllContacts(request)
+            try {
+                val reply = stub!!.getAllContacts(request)
                 contacts = reply?.contactsList
+            } catch (e: Exception) {
+                Log.e("debug", e.message)
+                return null
             }
+
             return contacts
         }
 
-        fun closeConnection() {
-            channel?.shutdown()?.awaitTermination(1, TimeUnit.SECONDS)
+        suspend fun closeConnection(): Boolean {
+            try {
+                channel!!.shutdown()!!.awaitTermination(1, TimeUnit.SECONDS)
+            } catch (e: Exception) {
+                //Log.e("debug", e.message)
+                return false
+            }
+            return true
         }
     }
 }

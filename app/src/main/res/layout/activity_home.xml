@@ -15,7 +15,7 @@
         android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="Host IP"
-        android:inputType="number"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

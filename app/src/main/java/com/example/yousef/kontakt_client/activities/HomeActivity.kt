@@ -6,6 +6,10 @@ import android.os.Bundle
 import com.example.yousef.kontakt_client.R
 import com.example.yousef.kontakt_client.networking.GRPCTasks
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.delay
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 
 class HomeActivity : AppCompatActivity() {
 
@@ -17,15 +21,18 @@ class HomeActivity : AppCompatActivity() {
            with the entered IP and port, if left blank connection will open  on port 8080 and my
             linux VM IP then go to contacts activity */
         connect_btn.setOnClickListener {
-            GRPCTasks.closeConnection()
 
             val hostIP = host_ip_edt.text.toString()
             val port = port_edt.text.toString()
 
-            if (hostIP != "" && port != "") GRPCTasks.openConnection(hostIP, port.toInt())
-            else GRPCTasks.openConnection()
-
-            startActivity(Intent(this, MainActivity::class.java))
+            launch {
+                runBlocking {
+                    GRPCTasks.closeConnection()
+                    if (hostIP != "" && port != "") GRPCTasks.openConnection(hostIP, port.toInt())
+                    else GRPCTasks.openConnection()
+                }
+                launch(UI) { startActivity(Intent(this@HomeActivity, MainActivity::class.java)) }
+            }
         }
     }
 }
